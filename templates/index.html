@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to {{ app_name }}!</h1>
+        <button id="colorButton">Change Background Color</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorButton = document.getElementById('colorButton');
+            const body = document.body;
+            const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"]; // Example colors
+
+            colorButton.addEventListener('click', function() {
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                body.style.backgroundColor = randomColor;
+            });
+        });
+    </script>
+</body>
+</html>
