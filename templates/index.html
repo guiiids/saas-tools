@@ -10,13 +10,42 @@
     <div class="container">
         <h1>Welcome to {{ app_name }}!</h1>
         <button id="colorButton">Change Background Color</button>
+        <button id="sendEmail">Send Email</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const colorButton = document.getElementById('colorButton');
+            const sendEmail = document.getElementById('sendEmail');
+
             const body = document.body;
             const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"]; // Example colors
+
+            sendEmail.addEventListener('click', function() {
+                fetch('/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'gui.vieiraa2@gmail.com',
+                        subject: 'Hello from Flask',
+                        message: 'This is a test email from Flask.'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
 
             colorButton.addEventListener('click', function() {
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
