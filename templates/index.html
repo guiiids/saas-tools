@@ -11,12 +11,14 @@
         <h1>Welcome to {{ app_name }}!</h1>
         <button id="colorButton">Change Background Color</button>
         <button id="sendEmail">Send Email</button>
+        <div id="statusMessage"></div> <!-- Add this element to display messages -->
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const colorButton = document.getElementById('colorButton');
             const sendEmail = document.getElementById('sendEmail');
+            const statusMessage = document.getElementById('statusMessage');
 
             const body = document.body;
             const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"]; // Example colors
@@ -34,16 +36,20 @@
                     })
                 })
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
+                    return response.json().then(data => {
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Unknown error');
+                        }
+                        return data;
+                    });
                 })
                 .then(data => {
-                    console.log('Success:', data);
+                    statusMessage.textContent = 'Success: ' + data.message + ' (Status Code: ' + data.status_code + ')';
+                    statusMessage.style.color = 'green';
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    statusMessage.textContent = 'Error: ' + error.message + ' (Status Code: ' + error.status_code + ')';
+                    statusMessage.style.color = 'red';
                 });
             });
 

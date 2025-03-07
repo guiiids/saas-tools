@@ -20,9 +20,9 @@ def send_email():
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        return jsonify({'message': 'Email sent successfully!'}), 200
+        return jsonify({'message': 'Email sent successfully!', 'status_code': response.status_code}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e), 'status_code': response.status_code if 'response' in locals() else 'N/A'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
