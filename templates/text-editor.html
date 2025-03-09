@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quill Editor Web App</title>
+
+  <link
+    href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Center your editor and control its max height */
+    .editor-wrapper {
+      max-width: 900px;               /* optional: control width */
+      margin: 2rem auto;             /* center horizontally */
+
+    }
+
+    /* Make this container scroll if content exceeds the max-height */
+    .editor-container {
+    min-height: calc(100vh - 200px);
+      max-height: calc(100vh - 200px); /* subtract space for navbar + margin */
+      overflow-y: auto;
+      border: 1px solid #fff;         /* optional: visible boundary */
+      border-radius: 10px;
+      padding: 1rem;
+box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    /* Make sure the editor itself expands to fill .editor-container */
+    
+    }
+    #quill-editor {
+      height: 100%;
+    }
+    #quill-editor {
+       min-height: calc(100vh - 310px);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Navbar</a>
+    </div>
+  </nav>
+
+  <div class="editor-wrapper">
+    <div class="editor-container">
+      <div id="quill-editor"></div>
+    </div>
+    <div class="mt-3">
+      <input type="email" id="email" class="form-control mb-2" placeholder="Recipient Email">
+      <input type="text" id="subject" class="form-control mb-2" placeholder="Subject">
+    </div>
+    <button
+      id="submit-button"
+      class="btn btn-primary mt-3 float-end"
+      onclick="submitContent()"
+    >
+      Submit
+    </button>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+  var quill = new Quill("#quill-editor", {
+    theme: "snow",
+    modules: {
+      toolbar: [
+        ["bold", "italic", "underline", "strike"],
+        ["blockquote", "code-block"],
+        [{ header: 1 }, { header: 2 }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ script: "sub" }, { script: "super" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        [{ direction: "rtl" }],
+        [{ size: ["small", false, "large", "huge"] }],
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        [{ color: [] }, { background: [] }],
+        [{ font: [] }],
+        [{ align: [] }],
+        ["clean"],
+      ],
+       clipboard: { // Add this for better pasting
+        matchVisual: false
+      }
+    },
+  });
+
+  // Load saved content from localStorage on page load
+  window.addEventListener("load", function () {
+    const savedContent = localStorage.getItem("quill_editor_content");
+
+    if (savedContent) {
+      // Use Quill's clipboard to paste previously saved HTML
+      quill.clipboard.dangerouslyPasteHTML(savedContent);
+    } else {
+      // Paste placeholder instructions if no saved content exists
+      const placeholderHtml = `
+        <h2><strong>Welcome to the iLab Knowledge Content Editor!</strong></h2>
+        <ol>
+          <li>Begin typing or paste your text here.</li>
+          <li>Use the toolbar above to format your content: make text <strong>bold</strong>, <em>italic</em>, or <u>underlined</u>; create headings, lists, or even code blocks.</li>
+          <li>When you’re finished, click the <strong>Submit</strong> button below to save or process your work.</li>
+        </ol>
+        <p>Feel free to replace this placeholder with your own content at any time!</p>
+      `;
+      quill.clipboard.dangerouslyPasteHTML(placeholderHtml);
+    }
+  });
+
+  // Save content to localStorage on text change
+  quill.on("text-change", function () {
+    const currentContent = quill.root.innerHTML;
+    localStorage.setItem("quill_editor_content", currentContent);
+  });
+
+  function submitContent() {
+    var editorContent = quill.root.innerHTML;
+    // Grab email and subject from the input fields
+    var email = document.getElementById('email').value;
+    var subject = document.getElementById('subject').value;
+    
+    // Build the payload with required data
+    var payload = {
+      email: email,
+      subject: subject,
+      message: editorContent
+    };
+
+    // Use fetch to post data to /send-email
+    fetch('/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.message) {
+        alert(data.message);
+      } else {
+        alert("Error: " + data.error);
+      }
+      // Optionally redirect or clear the editor here if needed
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("An unexpected error occurred.");
+    });
+  }
+</script>
+
+</body>
+
+</html>
