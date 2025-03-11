@@ -8,10 +8,8 @@ from sendgrid.helpers.mail import (
 )
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+
 
 # Requires: pip install html2text
 import html2text
