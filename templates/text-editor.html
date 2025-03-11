@@ -22,7 +22,7 @@
     html,
     body {
       height: 100%;
-      margin: 0;
+   
       padding: 0;
     }
 
@@ -42,20 +42,21 @@
       width: 70%;
       padding: 2rem;
     }
-
     .editor-wrapper {
-      max-width: 100%;
-      margin: 0 auto;
-    }
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    border-top: 4px solid hsl(200, 100%, 44%) !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  }
 
     .editor-container {
       min-height: calc(100vh - 250px);
       max-height: calc(100vh - 250px);
       overflow-y: auto;
-      border: 1px solid #fff;
+      border: 0px solid #fff;
       border-radius: 10px;
-      padding: 1rem;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+      
     }
 
     #quill-editor {
@@ -64,11 +65,16 @@
     }
 
     .button-group {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .alert {
+    margin-top: 1rem;
+    width: 100%;
+  }
     .btn-agilent {
       border: none;
       border-radius: 4px;
@@ -78,6 +84,14 @@
     i {
       font-size: 15px;
       padding-left: 7px;
+    }
+    .ql-editor p, .ql-editor ol, .ql-editor ul, .ql-editor pre, .ql-editor blockquote, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+      margin: 1rem !important;
+      padding: 0;
+    }
+
+    p, li, ul, span, ol, label, input {
+      font-size: 0.9rem;
     }
   </style>  
 </head>
@@ -99,6 +113,10 @@
       <img width="140" style="margin: 0 auto;" src="https://static.helpjuice.com/helpjuice_production/uploads/template/brand_image/3504/6107/CrossLab_iLab_-_transparent.png" alt="iLab Logo">
     </div>
     <div class="mt-4">
+      
+       <!-- Add this section for messages -->
+       <div id="message-box" class="alert" style="display: none;"></div>
+
       <p>Welcome to the <b>iLab KB Content Studio</b>. </p><p>This tool allows you to create and edit content for your Knowledge Base.</p>
       <p style="color:#2185D0;"><b>Instructions</b></p>
       <ul>
@@ -110,7 +128,7 @@
     </div>  
     <div class="right-column">
       <div class="editor-wrapper">
-        <h2 style="color:#2185D0;">Creator's Studio </h2>
+        <h4 style="color:#2185D0;">Content Editor </h4>
        <!-- <div class="mt-3">
           <small class="form-text text-muted">Please add your email address. This will be used as the sender's email.</small>
           <input type="email" id="sender-email" class="form-control mb-2" placeholder="Your email address">
@@ -123,8 +141,8 @@
         <div class="editor-container">
           <div id="quill-editor"></div>
         </div>
-        <div class="button-group">
-          <button id="download-button" class="btn btn-secondary btn-agilent" onclick="downloadDraft()">Download Draft |<i class="fa-solid fa-file-arrow-down" ></i></button>
+        <div class="button-group mt-2">
+          <button id="download-button" class="btn btn-secondary btn-agilent" onclick="downloadDraft()">Download Draft |<i class="fa-solid fa-file-arrow-down"></i></button>
           <button id="submit-button" class="btn btn-primary btn-agilent" onclick="submitContent()">Submit |<i class="fa-solid fa-paper-plane"></i></button>
         </div>
       </div>
@@ -154,6 +172,7 @@
       ],
     },
   });
+  
 
   // Load saved content from localStorage on page load
   window.addEventListener("load", function () {
@@ -189,21 +208,24 @@
     // Use fetch to post data to /send-email
     fetch('/send-email', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subject: document.getElementById('subject').value,
+        message: quill.root.innerHTML,
+      }),
     })
     .then(response => response.json())
     .then(data => {
-      if(data.message) {
-        alert(data.message);
+      if (data.error) {
+        showMessage(data.error, 'danger');
       } else {
-        alert("Error: " + data.error);
+        showMessage(data.message, 'success');
       }
-      // Optionally redirect or clear the editor here if needed
     })
     .catch(error => {
-      console.error('Error:', error);
-      alert("An unexpected error occurred.");
+      showMessage('An error occurred. Please try again.', 'danger');
     });
   }
   function downloadDraft() {
@@ -217,6 +239,13 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+  function showMessage(message, type) {
+    const messageBox = document.getElementById('message-box');
+    messageBox.innerText = message;
+    messageBox.className = `alert alert-${type}`;
+    messageBox.style.display = 'block';
+    messageBox.style.fontSize = '0.8rem';
   }
 </script>
 </body>

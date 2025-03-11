@@ -75,7 +75,7 @@ def send_email():
     # Build the email. The body is now just a placeholder, since the content is in attachments
     message = Mail(
         from_email='gui.vieiraa@gmail.com',  # Replace with your verified sender email
-        to_emails='gui.vieiraa2@gmail.com',
+        to_emails='guilherme.vieira-machado@agilent.com',
         subject=data['subject'],
         html_content='Please see attached Word document and images (if any).'
     )
