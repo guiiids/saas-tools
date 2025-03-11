@@ -13,6 +13,10 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    rel="stylesheet"
+  />
 
   <style>
     html,
@@ -22,55 +26,109 @@
       padding: 0;
     }
 
-    /* Center your editor and control its max height */
-    .editor-wrapper {
-      max-width: 900px;               /* optional: control width */
-      margin: 2rem auto;             /* center horizontally */
-
-    }
-
-    /* Make this container scroll if content exceeds the max-height */
-    .editor-container {
-    min-height: calc(100vh - 200px);
-      max-height: calc(100vh - 200px); /* subtract space for navbar + margin */
-      overflow-y: auto;
-      border: 1px solid #fff;         /* optional: visible boundary */
-      border-radius: 10px;
-      padding: 1rem;
-box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
-    /* Make sure the editor itself expands to fill .editor-container */
-    
-    }
-    #quill-editor {
+    .container {
+      display: flex;
       height: 100%;
     }
-    #quill-editor {
-       min-height: calc(100vh - 310px);
+
+    .left-column {
+      width: 30%;
+      padding: 2rem;
+      background-color: #f8f9fa;
+      overflow-y: auto;
     }
-  </style>
+
+    .right-column {
+      width: 70%;
+      padding: 2rem;
+    }
+
+    .editor-wrapper {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .editor-container {
+      min-height: calc(100vh - 250px);
+      max-height: calc(100vh - 250px);
+      overflow-y: auto;
+      border: 1px solid #fff;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    }
+
+    #quill-editor {
+      height: 100%;
+      min-height: calc(100vh - 360px);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .btn-agilent {
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    i {
+      font-size: 15px;
+      padding-left: 7px;
+    }
+  </style>  
 </head>
 <body>
+  
+  <!-- Start Navbar -->
+  <!-- Navbar 
   <nav class="navbar bg-primary">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
     </div>
   </nav>
+-->   
+    <!-- End Navbar -->
 
-  <div class="editor-wrapper">
-    <div class="editor-container">
-      <div id="quill-editor"></div>
+  <div class="container">
+    <div class="left-column">
+      <div class="container-fluid">
+      <img width="140" style="margin: 0 auto;" src="https://static.helpjuice.com/helpjuice_production/uploads/template/brand_image/3504/6107/CrossLab_iLab_-_transparent.png" alt="iLab Logo">
     </div>
-    <div class="mt-3">
-      <input type="email" id="email" class="form-control mb-2" placeholder="Recipient Email">
-      <input type="text" id="subject" class="form-control mb-2" placeholder="Subject">
+    <div class="mt-4">
+      <p>Welcome to the <b>iLab KB Content Studio</b>. </p><p>This tool allows you to create and edit content for your Knowledge Base.</p>
+      <p style="color:#2185D0;"><b>Instructions</b></p>
+      <ul>
+        <li>Add the document title in the subject field.</li>
+        <li>Use the editor area to review and add your text.</li>
+        <li>Images are accepted; just paste the image, and it will be sent as an attachment.</li>
+      </ul>
     </div>
-    <button
-      id="submit-button"
-      class="btn btn-primary mt-3 float-end"
-      onclick="submitContent()"
-    >
-      Submit
-    </button>
+    </div>  
+    <div class="right-column">
+      <div class="editor-wrapper">
+        <h2 style="color:#2185D0;">Creator's Studio </h2>
+       <!-- <div class="mt-3">
+          <small class="form-text text-muted">Please add your email address. This will be used as the sender's email.</small>
+          <input type="email" id="sender-email" class="form-control mb-2" placeholder="Your email address">
+        </div>
+        -->
+        <div class="mt-3">
+          <small class="form-text text-muted">Please add the document name. This will be included in the email as the subject line.</small>
+          <input type="text" id="subject" class="form-control mb-2" placeholder="E.g. 'How to Use the iLab Knowledge Content Editor'">
+        </div>
+        <div class="editor-container">
+          <div id="quill-editor"></div>
+        </div>
+        <div class="button-group">
+          <button id="download-button" class="btn btn-secondary btn-agilent" onclick="downloadDraft()">Download Draft |<i class="fa-solid fa-file-arrow-down" ></i></button>
+          <button id="submit-button" class="btn btn-primary btn-agilent" onclick="submitContent()">Submit |<i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script
@@ -92,13 +150,8 @@ box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6
         [{ size: ["small", false, "large", "huge"] }],
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
         [{ color: [] }, { background: [] }],
-        [{ font: [] }],
-        [{ align: [] }],
         ["clean"],
       ],
-       clipboard: { // Add this for better pasting
-        matchVisual: false
-      }
     },
   });
 
@@ -107,38 +160,28 @@ box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6
     const savedContent = localStorage.getItem("quill_editor_content");
 
     if (savedContent) {
-      // Use Quill's clipboard to paste previously saved HTML
       quill.clipboard.dangerouslyPasteHTML(savedContent);
-    } else {
-      // Paste placeholder instructions if no saved content exists
-      const placeholderHtml = `
-        <h2><strong>Welcome to the iLab Knowledge Content Editor!</strong></h2>
-        <ol>
-          <li>Begin typing or paste your text here.</li>
-          <li>Use the toolbar above to format your content: make text <strong>bold</strong>, <em>italic</em>, or <u>underlined</u>; create headings, lists, or even code blocks.</li>
-          <li>When you’re finished, click the <strong>Submit</strong> button below to save or process your work.</li>
-        </ol>
-        <p>Feel free to replace this placeholder with your own content at any time!</p>
-      `;
-      quill.clipboard.dangerouslyPasteHTML(placeholderHtml);
     }
-  });
-
-  // Save content to localStorage on text change
-  quill.on("text-change", function () {
-    const currentContent = quill.root.innerHTML;
-    localStorage.setItem("quill_editor_content", currentContent);
   });
 
   function submitContent() {
     var editorContent = quill.root.innerHTML;
-    // Grab email and subject from the input fields
-    var email = document.getElementById('email').value;
+    // var senderEmail = document.getElementById('sender-email').value;
     var subject = document.getElementById('subject').value;
+
+//    if (!senderEmail) {
+//      alert("Error: Missing field required - Sender's Email");
+//      return;
+//    }
+
+    if (!subject) {
+      alert("Error: Missing field required - Subject");
+      return;
+    }
     
     // Build the payload with required data
     var payload = {
-      email: email,
+    //  email: senderEmail,
       subject: subject,
       message: editorContent
     };
@@ -163,8 +206,18 @@ box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6
       alert("An unexpected error occurred.");
     });
   }
+  function downloadDraft() {
+    var editorContent = quill.root.innerHTML;
+    var blob = new Blob(['<html><body>' + editorContent + '</body></html>'], { type: 'application/msword' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'draft.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 </script>
-
 </body>
-
 </html>

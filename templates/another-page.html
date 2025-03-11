@@ -22,13 +22,37 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
+        .image-container {
+            position: relative;
+            text-align: center;
+            color: white;
+    
+        }
+        .centered-text {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .image-container img {
+            max-width: 80%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome</h1>
-        <a href="/text-editor" class="btn btn-primary btn-block">Text Editor</a>
-        <a href="/another-page" class="btn btn-secondary btn-block">Coming Soon</a>
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='construction.png') }}" alt="Construction Image" class="img-fluid">
+            <div class="centered-text">
+                <h4>Pardon Our Appearance. Construction Under Way.</h4>
+            </div>
+        </div>
+        <a href="/text-editor" class="btn btn-primary btn-block mt-3">Text Editor</a>
+        <a href="/" class="btn btn-secondary btn-block mt-3">Home</a>
     </div>
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
